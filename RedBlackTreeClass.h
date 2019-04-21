@@ -1,7 +1,5 @@
-
 #ifndef RedBlackTreeClass_h
 #define RedBlackTreeClass_h
-
 
 #include<iostream>
 #include "listTemplate.h"
@@ -18,10 +16,11 @@ template <class T, class V>
 class RedBlackTree {
 public:
     Node<T, V> *root;
-    Node<T, V> *NIL;
+    //Node<T, V> *nullptr;
     RedBlackTree() {
-        NIL = new Node<T, V>();
-        root = NIL;
+        //nullptr = new Node<T, V>();
+        //root = nullptr;
+		root = nullptr;
     }
     ~RedBlackTree() {
         clear();
@@ -31,7 +30,7 @@ public:
     void turnRight(Node<T, V> *x);
     void insertFix(Node<T, V> *fixNode);
     void remove(T key);
-    void fixRemove(Node<T, V> *fixNode);
+    void fixRemove(Node<T, V> *fixNode, Node<T, V> *fixParent);
     void clear();
     MyList<T> get_keys();
     MyList<V> get_values();
@@ -53,7 +52,8 @@ public:
     void clearNode();
     MyList<T> get_keys_Node(MyList<T> keyList);
     MyList<T> get_values_Node(MyList<V> valueList);
-    friend class RedBlackTree<T, V>;
+	bool getColor();
+	friend class RedBlackTree<T, V>;
 };
 
 template <class T, class V>
@@ -72,14 +72,14 @@ Node<T, V>::Node() {
 
 template <class T, class V>
 Node<T, V>::Node (T key, V value, Node *parent) {
-    this->left = Tree<T, V>->NIL;
-    this->right = Tree<T, V>->NIL;
-    this->parent = parent;
+    //this->left = Tree<T, V>->nullptr;
+    //this->right = Tree<T, V>->nullptr;
+	this->left = nullptr;
+	this->right = nullptr;
+	this->parent = parent;
     this->key = key;
     this->color = true;
     this->value = value;
-    this->right->parent = this;
-    this->left->parent = this;
 }
 
 template <class T, class V>
@@ -93,7 +93,7 @@ Node<T, V>::~Node() {
 
 template <class T, class V>
 void Node<T, V>::clearNode() {
-    if (this != nullptr && this->key != 0) {
+    if (this != nullptr) {
         left->clearNode();
         right->clearNode();
         delete this;
@@ -102,7 +102,7 @@ void Node<T, V>::clearNode() {
 
 template <class T, class V>
 MyList<T> Node<T, V>::get_keys_Node(MyList<T> keyList) {
-    if (this->key != 0 && this != nullptr) {
+    if (this != nullptr) {
         keyList = left->get_keys_Node(keyList);
         keyList = right->get_keys_Node(keyList);
         keyList.push_back(this->key);
@@ -112,12 +112,23 @@ MyList<T> Node<T, V>::get_keys_Node(MyList<T> keyList) {
 
 template <class T, class V>
 MyList<T> Node<T, V>::get_values_Node(MyList<V> valueList) {
-    if (this->key != 0 && this != nullptr) {
+    if (this != nullptr) {
         valueList = left->get_values_Node(valueList);
         valueList = right->get_values_Node(valueList);
         valueList.push_back(this->value);
     }
     return valueList;
+}
+
+template <class T, class V>
+bool Node<T, V>::getColor() {
+	if (this != nullptr) {
+		return this->color;
+	}
+	else
+	{
+		return false;
+	}
 }
 //Defining RedBlackTree methods
 
@@ -125,13 +136,13 @@ template <class T, class V>
 void RedBlackTree<T, V>::turnLeft (Node<T, V> *fixingNode) {
     Node<T, V> *rightSon = fixingNode->right;
     fixingNode->right = rightSon->left;
-    if (rightSon->left != NIL) {
+    if (rightSon->left != nullptr) {
         rightSon->left->parent = fixingNode;
     }
-    if (rightSon != NIL) {
+    if (rightSon != nullptr) {
         rightSon->parent = fixingNode->parent;
     }
-    if (fixingNode->parent != NIL) {
+    if (fixingNode->parent != nullptr) {
         if (fixingNode == fixingNode->parent->left) {
             fixingNode->parent->left = rightSon;
         }
@@ -143,23 +154,22 @@ void RedBlackTree<T, V>::turnLeft (Node<T, V> *fixingNode) {
         root = rightSon;
     }
     rightSon->left = fixingNode;
-    if (fixingNode != NIL) {
+    if (fixingNode != nullptr) {
         fixingNode->parent = rightSon;
     }
 }
 
-//Переименовать x и y
 template <class T, class V>
 void RedBlackTree<T, V>::turnRight(Node<T, V> *turningNode) {
     Node<T, V> *leftSon = turningNode->left;
     turningNode->left = leftSon->right;
-    if (leftSon->right != NIL) {
+    if (leftSon->right != nullptr) {
         leftSon->right->parent = turningNode;
     }
-    if (leftSon != NIL) {
+    if (leftSon != nullptr) {
         leftSon->parent = turningNode->parent;
     }
-    if (turningNode->parent != NIL) {
+    if (turningNode->parent != nullptr) {
         if (turningNode == turningNode->parent->right) {
             turningNode->parent->right = leftSon;
         }
@@ -171,7 +181,7 @@ void RedBlackTree<T, V>::turnRight(Node<T, V> *turningNode) {
         root = leftSon;
     }
     leftSon->right = turningNode;
-    if (turningNode != NIL) {
+    if (turningNode != nullptr) {
         turningNode->parent = leftSon;
     }
 }
@@ -179,7 +189,7 @@ void RedBlackTree<T, V>::turnRight(Node<T, V> *turningNode) {
 
 template <class T, class V>
 void RedBlackTree<T, V>::insert(T key, V value) {
-    Node<T, V> *current, *parent, *newNode;
+    Node<T, V> *current, *parent = nullptr, *newNode;
     current = root;
     if (key <= 0) { //Исправить ситуацию с отрицательным значениями (Тест с отрицательными ключами)
         throw invalid_argument("Can not insert this type of key");
@@ -190,7 +200,7 @@ void RedBlackTree<T, V>::insert(T key, V value) {
             throw invalid_argument("This key already exist");
         }
         catch (out_of_range error) {
-            while (current->key != 0) {
+            while (current != nullptr) {
                 parent = current;
                 if (key < current->key) {
                     current = current->left;
@@ -201,7 +211,7 @@ void RedBlackTree<T, V>::insert(T key, V value) {
             }
             newNode = new Node<T, V>(key, value, parent);
             
-            if (parent != NIL) {
+            if (parent != nullptr) {
                 if (key < parent->key) {
                     parent->left = newNode;
                 }
@@ -219,16 +229,11 @@ void RedBlackTree<T, V>::insert(T key, V value) {
 
 template <class T, class V>
 void RedBlackTree<T, V>::insertFix(Node<T, V> *fixNode) {
-    Node<T, V> *uncle = NIL;
-    while ((fixNode != root) && (fixNode->parent->color == true)) {
+    Node<T, V> *uncle = nullptr;
+    while ((fixNode != root) && (fixNode->parent->getColor() == true)) {
         if (fixNode->parent == fixNode->parent->parent->left) {
-            if (fixNode->parent->parent->right) {
-                uncle = fixNode->parent->parent->right;
-            }
-            else {
-                uncle = new Node<T, V>();
-            }
-            if (uncle->color == true) {
+            uncle = fixNode->parent->parent->right;
+            if (uncle->getColor() == true) {
                 fixNode->parent->color = false;
                 uncle->color = false;
                 fixNode->parent->parent->color = true;
@@ -245,14 +250,8 @@ void RedBlackTree<T, V>::insertFix(Node<T, V> *fixNode) {
             }
         }
         else {
-            if (fixNode->parent->parent->left) {
-                uncle = fixNode->parent->parent->left;
-                
-            }
-            else {
-                uncle = new Node<T, V>();
-            }
-            if (uncle->color == true) {
+            uncle = fixNode->parent->parent->left;
+            if (uncle->getColor() == true) {
                 fixNode->parent->color = false;
                 uncle->color = false;
                 fixNode->parent->parent->color = true;
@@ -293,45 +292,45 @@ Node<T, V> *RedBlackTree<T, V>::find(T key) {
 
 template <class T, class V>
 void RedBlackTree<T, V>::remove(T key){
-    Node<T, V> *deleteNode, *x, *y;
+    Node<T, V> *deleteNode, *deleteSon, *deleteObj;
     deleteNode = find(key);
-    if (deleteNode->left->key == 0 || deleteNode->right->key == 0) {
-        y = deleteNode;
+    if (deleteNode->left == nullptr || deleteNode->right == nullptr) {
+        deleteObj = deleteNode;
     }
     else {
-        y = deleteNode->right;
-        while (y->left->key != 0) {
-            y = y->left;
+        deleteObj = deleteNode->right;
+        while (deleteObj->left != nullptr) {
+            deleteObj = deleteObj->left;
         }
     }
-    if (y->left->key != 0) {
-        x = y->left;
+    if (deleteObj->left != nullptr) {
+        deleteSon = deleteObj->left;
     }
     else {
-        x = y->right;
+        deleteSon = deleteObj->right;
     }
-    if (y->parent->key != 0) {
-        if (x->key != 0) {
-            x->parent = y->parent;
+    if (deleteObj->parent != nullptr) {
+        if (deleteSon != nullptr) {
+            deleteSon->parent = deleteObj->parent;
         }
-        if (y == y->parent->left) {
-            y->parent->left = x;
+        if (deleteObj == deleteObj->parent->left) {
+            deleteObj->parent->left = deleteSon;
         }
         else {
-            y->parent->right = x;
+            deleteObj->parent->right = deleteSon;
         }
     }
     else {
-        x = root;
+        deleteSon = root;
     }
-    if (y != deleteNode) {
-        deleteNode->key = y->key;
+    if (deleteObj != deleteNode) {
+        deleteNode->key = deleteObj->key;
     }
-    if (y->color == false) {
-        fixRemove(x);
+    if (deleteObj->color == false) {
+		fixRemove(deleteSon, deleteObj->parent);
     }
-    if (y != root) {
-        delete y;
+    if (deleteObj != root) {
+        delete deleteObj;
     }
     else {
         clear();
@@ -339,70 +338,60 @@ void RedBlackTree<T, V>::remove(T key){
 }
 
 template <class T, class V>
-void RedBlackTree<T, V>::fixRemove(Node<T, V> *fixNode) {
+void RedBlackTree<T, V>::fixRemove(Node<T, V> *fixNode, Node<T, V> *fixParent) {
     Node<T, V> *brother;
-    while (fixNode != root && fixNode->color == false) {
-        if (fixNode == fixNode->parent->left) {
-            if (fixNode->parent->right->key != 0) {
-                brother  = fixNode->parent->right;
-            }
-            else {
-                brother  = new Node<T, V>();
-            }
-            if (brother->color == true) {
+    while (fixNode != root && fixNode->getColor() == false) {
+        if (fixNode == fixParent->left) {
+            brother  = fixParent->right;
+            if (brother->getColor() == true) {
                 brother->color = false;
-                fixNode->parent->color = true;
-                turnLeft(fixNode->parent);
-                brother  = fixNode->parent->right;
+                fixParent->color = true;
+                turnLeft(fixParent);
+                brother = fixParent->right;
             }
-            if ( (brother->left == nullptr || brother->left->color == false) && (brother->right == nullptr || brother->right->color == false)) {
+            if (brother->left->getColor() == false && brother->right->getColor() == false) {
                 brother->color = true;
-                fixNode = fixNode->parent;
+                fixNode = fixParent;
             }
             else {
-                if (brother->right->color == false) {
+                if (brother->right->getColor() == false) {
                     brother->left->color = false;
                     brother->color = true;
                     turnRight(brother);
-                    brother = fixNode->parent->right;
+                    brother = fixParent->right;
                 }
-                brother->color = fixNode->parent->color;
-                fixNode->parent->color = false;
+                brother->color = fixParent->color;
+                fixParent->color = false;
                 fixNode->right->color = false;
-                turnLeft(fixNode->parent);
+                turnLeft(fixParent);
                 fixNode = root;
             }
         }
         else {
-            if (fixNode->parent->left != NIL) {
-                brother = fixNode->parent->left;
-            }
-            else {
-                brother = new Node<T, V>();
-            }
-            if (brother->color == true) {
+            brother = fixParent->left;
+            if (brother->getColor() == true) {
                 brother->color = false;
-                fixNode->parent->color = true;
-                turnRight(fixNode->parent);
-                brother = fixNode->parent->left;
+                fixParent->color = true;
+                turnRight(fixParent);
+                brother = fixParent->left;
             }
-            if (brother->right->color == false && brother->left->color == false) {
+            if (brother->right->getColor() == false && brother->left->getColor() == false) {
                 brother->color = true;
-                fixNode = fixNode->parent;
+                fixNode = fixParent;
             }
             else {
-                if (brother->left == NIL || brother->left->color == false ) {
-                    if (brother->right != NIL) {
+                if (brother->left->getColor() == false ) {
+                    if (brother->right != nullptr) {
                         brother->right->color = false;
                     }
                     brother->color = true;
                     turnLeft(brother);
-                    brother = fixNode->parent->left;
+                    brother = fixParent->left;
                 }
-                brother->color = fixNode->parent->color;
-                fixNode->parent->color = false;
+                brother->color = fixParent->color;
+                fixParent->color = false;
                 brother->left->color = false;
-                turnRight(fixNode->parent);
+                turnRight(fixParent);
                 fixNode = root;
             }
         }
@@ -412,8 +401,8 @@ void RedBlackTree<T, V>::fixRemove(Node<T, V> *fixNode) {
 template <class T, class V>
 void RedBlackTree<T, V>::clear() {
     root->clearNode();
-    delete NIL;
-    NIL = nullptr;
+    //delete nullptr;
+    //nullptr = nullptr;
     root = nullptr;
 }
 

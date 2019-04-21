@@ -1,11 +1,3 @@
-//
-//  listTemplate.h
-//  GoogleTestExample
-//
-//  Created by Ирина Литвинова on 16/04/2019.
-//  Copyright © 2019 Alloysoft. All rights reserved.
-//
-
 #ifndef listTemplate_h
 #define listTemplate_h
 
