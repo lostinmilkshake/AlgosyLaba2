@@ -14,24 +14,25 @@ template <class T, class V> class Node;
 // Defiining the class RedBlack Tree
 template <class T, class V>
 class RedBlackTree {
-public:
+private:
     Node<T, V> *root;
-    //Node<T, V> *nullptr;
+    void turnLeft(Node<T, V> *x);
+    void turnRight(Node<T, V> *x);
+    void insertFix(Node<T, V> *fixNode);
+    void fixRemove(Node<T, V> *fixNode, Node<T, V> *fixParent);
+public:
     RedBlackTree() {
-        //nullptr = new Node<T, V>();
-        //root = nullptr;
 		root = nullptr;
     }
     ~RedBlackTree() {
         clear();
     }
     void insert(T key, V value);
-    void turnLeft(Node<T, V> *x);
-    void turnRight(Node<T, V> *x);
-    void insertFix(Node<T, V> *fixNode);
     void remove(T key);
-    void fixRemove(Node<T, V> *fixNode, Node<T, V> *fixParent);
     void clear();
+    Node<T, V> *returnRoot(){
+        return root;
+    }
     MyList<T> get_keys();
     MyList<V> get_values();
     Node<T, V> *find(T key);
@@ -39,25 +40,30 @@ public:
 
 template <class T, class V>
 class Node {
-public:
+private:
     T key;
     bool color; //if true then color red, else color black
     V value;
     Node *left;
     Node *right;
     Node *parent;
-    Node();
-    Node(T key, V value, Node *parent);
-    ~Node();
     void clearNode();
     MyList<T> get_keys_Node(MyList<T> keyList);
     MyList<T> get_values_Node(MyList<V> valueList);
-	bool getColor();
+    bool getColor();
+public:
+    Node();
+    Node(T key, V value, Node *parent);
+    ~Node();
+    T returnKey() {
+        return key;
+    }
+    V returnValue() {
+        return value;
+    }
 	friend class RedBlackTree<T, V>;
 };
 
-template <class T, class V>
-RedBlackTree<T, V> *Tree = new RedBlackTree<T, V>();
 //Defining Node methods
 
 template <class T, class V>
@@ -191,39 +197,33 @@ template <class T, class V>
 void RedBlackTree<T, V>::insert(T key, V value) {
     Node<T, V> *current, *parent = nullptr, *newNode;
     current = root;
-    if (key <= 0) { //Исправить ситуацию с отрицательным значениями (Тест с отрицательными ключами)
-        throw invalid_argument("Can not insert this type of key");
+    try {
+        newNode = find(key);
+        throw invalid_argument("This key already exist");
     }
-    else {
-        try {
-            newNode = find(key);
-            throw invalid_argument("This key already exist");
-        }
-        catch (out_of_range error) {
-            while (current != nullptr) {
-                parent = current;
-                if (key < current->key) {
-                    current = current->left;
-                }
-                else {
-                    current = current->right;
-                }
-            }
-            newNode = new Node<T, V>(key, value, parent);
-            
-            if (parent != nullptr) {
-                if (key < parent->key) {
-                    parent->left = newNode;
-                }
-                else {
-                    parent->right = newNode;
-                }
+    catch (out_of_range error) {
+        while (current != nullptr) {
+            parent = current;
+            if (key < current->key) {
+                current = current->left;
             }
             else {
-                root = newNode;
+                current = current->right;
             }
-            insertFix(newNode);
         }
+        newNode = new Node<T, V>(key, value, parent);
+        if (parent != nullptr) {
+            if (key < parent->key) {
+                parent->left = newNode;
+            }
+            else {
+                parent->right = newNode;
+            }
+        }
+        else {
+            root = newNode;
+        }
+        insertFix(newNode);
     }
 }
 

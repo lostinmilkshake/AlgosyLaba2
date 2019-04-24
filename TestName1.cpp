@@ -10,21 +10,21 @@ TEST(MapTests, testInsertAndFind) {
     testTree.insert(1, 3);
     testTree.insert(5, 4);
     testNode = testTree.find(11);
-    EXPECT_EQ(testNode->key, 11);
-    EXPECT_EQ(testNode->value, 1);
+    EXPECT_EQ(testNode->returnKey(), 11);
+    EXPECT_EQ(testNode->returnValue(), 1);
 }
 
-TEST(MapTests, testInsertWrongValue) {
+TEST(MapTests, testInsertMinusValue) {
     RedBlackTree<int, int> testTree;
+    Node<int, int> *testNode;
     testTree.insert(11, 1);
     testTree.insert(6, 2);
     testTree.insert(1, 3);
     testTree.insert(5, 4);
-    try {
-        testTree.insert(0, 12);
-    } catch (invalid_argument error) {
-        ASSERT_STRCASEEQ("Can not insert this type of key", error.what());
-    }
+    testTree.insert(-32, -9);
+    testNode = testTree.find(-32);
+    EXPECT_EQ(testNode->returnKey(), -32);
+    EXPECT_EQ(testNode->returnValue(), -9);
 }
 
 TEST(MapTests, testFindNonExisting) {
@@ -49,7 +49,7 @@ TEST(MapTests, testClear) {
     testTree.insert(1, 3);
     testTree.insert(5, 4);
     testTree.clear();
-    EXPECT_EQ(testTree.root, nullptr);
+    EXPECT_EQ(testTree.returnRoot(), nullptr);
     //EXPECT_EQ(testTree, nullptr);
 }
 
@@ -114,8 +114,8 @@ TEST(CharMapTests, testInsertAndFind) {
     testTree.insert('a', 'c');
     testTree.insert('g', 'd');
     testNode = testTree.find('h');
-    EXPECT_EQ(testNode->key, 'h');
-    EXPECT_EQ(testNode->value, 'a');
+    EXPECT_EQ(testNode->returnKey(), 'h');
+    EXPECT_EQ(testNode->returnValue(), 'a');
 }
 
 TEST(CharMapTests, testInsertWrongValue) {
@@ -153,7 +153,7 @@ TEST(CharMapTests, testClear) {
     testTree.insert('a', 'c');
     testTree.insert('g', 'd');
     testTree.clear();
-    EXPECT_EQ(testTree.root, nullptr);
+    EXPECT_EQ(testTree.returnRoot(), nullptr);
     //EXPECT_EQ(testTree.NIL, nullptr);
 }
 
