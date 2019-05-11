@@ -1,5 +1,6 @@
-#ifndef listTemplate_h
-#define listTemplate_h
+#pragma once
+//#ifndef listTemplate_h
+//#define listTemplate_h
 
 #include<iostream>
 using  namespace std;
@@ -26,6 +27,7 @@ public:
     Element<T> getNext() {
         return next;
     }
+	friend bool operator==(const MyList<T>& firstList, const MyList<T>& secondList);
     friend class MyList<T>;
 };
 
@@ -81,7 +83,7 @@ public:
     void remove(int position);
     void clear();
     void set(T add, int position);
-    friend bool operator==(const MyList<T> &firstList, const MyList<T> &secondList)  {
+    friend bool operator==(const MyList<T> &firstList, const MyList<T> &secondList) {
         Element<T> *firstElement, *secondElement;
         size_t i = 0, listsSize = firstList.get_size();
         if (firstList.get_size() != secondList.get_size()) {
@@ -301,4 +303,4 @@ void MyList<T>::set(T add, int position) {
     }
 }
 
-#endif /* listTemplate_h */
+//#endif /* listTemplate_h */
