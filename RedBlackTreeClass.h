@@ -3,8 +3,8 @@
 
 #include<iostream>
 #include "listTemplate.h"
+#include <stack>
 
-//Перенести нужные значения в private
 
 using namespace std;
 
@@ -33,8 +33,8 @@ public:
     Node<T, V> *returnRoot(){
         return root;
     }
-    MyList<T> get_keys();
-    MyList<V> get_values();
+    MyList<T> *get_keys();
+    MyList<V> *get_values();
     Node<T, V> *find(T key);
 };
 
@@ -118,12 +118,13 @@ MyList<T> Node<T, V>::get_keys_Node(MyList<T> keyList) {
 
 template <class T, class V>
 MyList<T> Node<T, V>::get_values_Node(MyList<V> valueList) {
-    if (this != nullptr) {
+/*    if (this != nullptr) {
         valueList = left->get_values_Node(valueList);
         valueList = right->get_values_Node(valueList);
         valueList.push_back(this->value);
     }
     return valueList;
+*/
 }
 
 template <class T, class V>
@@ -325,6 +326,7 @@ void RedBlackTree<T, V>::remove(T key){
     }
     if (deleteObj != deleteNode) {
         deleteNode->key = deleteObj->key;
+        deleteNode->value = deleteObj->value;
     }
     if (deleteObj->color == false) {
 		fixRemove(deleteSon, deleteObj->parent);
@@ -401,23 +403,54 @@ void RedBlackTree<T, V>::fixRemove(Node<T, V> *fixNode, Node<T, V> *fixParent) {
 template <class T, class V>
 void RedBlackTree<T, V>::clear() {
     root->clearNode();
-    //delete nullptr;
-    //nullptr = nullptr;
     root = nullptr;
 }
 
+
 template <class T, class V>
-MyList<T> RedBlackTree<T, V>::get_keys() {
-    MyList<T> keyList;
-    keyList = root->get_keys_Node(keyList);
+MyList<T> *RedBlackTree<T, V>::get_keys() {
+    MyList<V> *keyList = new MyList<T>();
+    Node<T, V> *helpNode = root;
+    stack< Node<T, V> *> stackKey;
+    while (!stackKey.empty() || helpNode != nullptr) {
+        if (helpNode != nullptr) {
+            keyList->push_back(helpNode->key);
+            if (helpNode->right) {
+                stackKey.push(helpNode->right);
+            }
+            helpNode = helpNode->left;
+        }
+        else {
+            helpNode = stackKey.top();
+            stackKey.pop();
+        }
+    }
     return keyList;
 }
 
+
+
 template <class T, class V>
-MyList<V> RedBlackTree<T, V>::get_values() {
-    MyList<T> valueList;
-    valueList = root->get_values_Node(valueList);
+MyList<V> *RedBlackTree<T, V>::get_values() {
+    MyList<V> *valueList = new MyList<V>();
+    Node<T, V> *helpNode = root;
+    stack< Node<T, V> *> stackValues;
+    while (!stackValues.empty() || helpNode != nullptr) {
+        if (helpNode != nullptr) {
+            valueList->push_back(helpNode->value);
+            if (helpNode->right) {
+                stackValues.push(helpNode->right);
+            }
+            helpNode = helpNode->left;
+        }
+        else {
+            helpNode = stackValues.top();
+            stackValues.pop();
+        }
+    }
     return valueList;
 }
+
+
 
 #endif /* RedBlackTreeClass_h */

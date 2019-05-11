@@ -1,16 +1,17 @@
 #ifndef listTemplate_h
 #define listTemplate_h
 
+#include<iostream>
 using  namespace std;
 
-template <class T> class MyList;
+template <class T> class  MyList;
 
 template <class T>
 class Element {
-public:
+private:
     T data;
     Element *next;
-    
+public:
     Element<T>(){};
     Element<T>(T number) {
         this->data = number;
@@ -18,30 +19,37 @@ public:
     }
     ~Element() {
         data = 0;
-    }//TODO Fix Destructor
+    }
+    T getData(){
+        return data;
+    }
+    Element<T> getNext() {
+        return next;
+    }
     friend class MyList<T>;
 };
 
 // Объявление класса списка
 template <class T>
 class MyList {
-public:
+private:
     Element<T> *head;
     Element<T> *tail;
-    int size; // на size_t
-    
+    size_t size;
+public:
     MyList() {
         this->head = nullptr;
         this->tail = nullptr;
         this->size = 0;
     }
-    /*MyList(initializer_list<T> t_list) {
+    MyList(std::initializer_list<T> t_list) {
         this->size = 0;
         for (auto elem : t_list) {
             push_back(elem);
         }
-    };*/
-   /* ~MyList() { //TODO addiction for fixing destructor
+    };
+    
+    ~MyList() {
         Element<T> *p1 = head, *p2 = head;
         if (size != 0) {
             while (p2 != nullptr) {
@@ -53,10 +61,18 @@ public:
             head = nullptr;
             tail = nullptr;
         }
-    }*/
+        size = 0;
+    }
+    
+    Element<T> *getHead() {  //Returns pointer of the head
+        return head;
+    }
+    Element<T> *getTail() { //Returns pointer of the tail
+        return tail;
+    }
     void push_front(T add);
     void push_back(T add);
-    int get_size() const;
+    size_t get_size() const;
     void pop_front();
     void pop_back();
     Element<T> &at(int position);
@@ -65,7 +81,34 @@ public:
     void remove(int position);
     void clear();
     void set(T add, int position);
+    friend bool operator==(const MyList<T> &firstList, const MyList<T> &secondList)  {
+        Element<T> *firstElement, *secondElement;
+        size_t i = 0, listsSize = firstList.get_size();
+        if (firstList.get_size() != secondList.get_size()) {
+            return false;
+        }
+        else {
+            firstElement = firstList.head;
+            secondElement = secondList.head;
+            while (i < listsSize && firstElement->data == secondElement->data) {
+                firstElement = firstElement->next;
+                secondElement = secondElement->next;
+                i++;
+            }
+            if (i != listsSize) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
 };
+
+/*template <class T>
+bool operator==(const MyList<T> &firstList, const MyList<T> &secondList) {
+
+}*/
 
 template <class T>
 ostream &operator<<(ostream &os, const MyList<T> &lst) {
@@ -83,7 +126,7 @@ template <class T>
 void MyList<T>::push_back(T add) {
     Element<T> *newElement;
     newElement = new Element<T>(add);
-    if (size == 0) {
+    if (size == 0) { //Checking is there any elements in list
         this->head = newElement;
         this->tail = newElement;
     }
@@ -99,7 +142,7 @@ template <class T>
 void MyList<T>::push_front(T add) {
     Element<T> *newElement;
     newElement = new Element<T>(add);
-    if (size == 0) {
+    if (size == 0) { //Checking is there any elements in list
         head = newElement;
         tail = newElement;
     }
@@ -112,7 +155,7 @@ void MyList<T>::push_front(T add) {
 
 //Returning the size of list
 template <class T>
-int MyList<T>::get_size() const {
+size_t MyList<T>::get_size() const {
     return size;
 }
 
@@ -120,9 +163,9 @@ int MyList<T>::get_size() const {
 template <class T>
 void MyList<T>::pop_back() {
     Element<T> *p1;
-    if (size > 1) {
+    if (size > 1) { //Checking is there more then one element
         p1 = head;
-        while (p1->next != tail) {
+        while (p1->next != tail) { //Going to element, which stands before tail
             p1 = p1->next;
         }
         delete tail;
@@ -131,9 +174,9 @@ void MyList<T>::pop_back() {
         tail = p1;
     } else{
         if (size == 1) {
-            delete head;
+            delete head; //Just deleting the head
             size--;
-        } else {
+        } else { //If there are no elements in the list
             throw out_of_range("There is no element to delete");
         }
     }
@@ -143,12 +186,12 @@ void MyList<T>::pop_back() {
 template <class T>
 void MyList<T>::pop_front() {
     Element<T> *begining = head;
-    if (size != 0) {
+    if (size != 0) { //Checking is there ane elements in the list
         head = head->next;
-        delete begining;
+        delete begining; // deleting first element
         size--;
     }
-    else {
+    else { //If there are no elements
         throw out_of_range("There is no element to delete");
     }
 }
@@ -157,13 +200,13 @@ void MyList<T>::pop_front() {
 template <class T>
 Element<T> &MyList<T>::at(int position) {
     Element<T> *p1;
-    if ((size >= position) && (position > 0)) {
+    if ((size > position) && (position >= 0)) {
         p1 = head;
-        for (size_t i = 0; i < position; i++) {
+        for (size_t i = 0; i < position; i++) { //Going to the element
             p1 = p1->next;
         }
         return *p1;
-    } else {
+    } else { //If we try to get elment, which doesn't exist in the list
         throw out_of_range("Index is greater than list size");
     }
 }
@@ -181,20 +224,21 @@ void MyList<T>::insert(T add, int position) {
     p1 = head;
     newElement = new Element<T>(add);
     if ((position < size) && (position >= 0)) {
-        if (position == 0) {
+        if (position == 0) { //If we want to add first element we just use push_front
             push_front(add);
         } else {
-            if (position == size + 1) {
+            if (position == size + 1) { //If we want to add last element we just use push_back
                 push_back(add);
             } else {
                 for (size_t i = 0; i < position - 1; i++) {
+                    //Going to the element, before which we going to insert
                     p1 = p1->next;
                 }
                 newElement->next = p1->next;
                 p1->next = newElement;
             }
         }
-    } else{
+    } else{ //If we try to go to the elment, which doesn't exist in the list
         throw out_of_range("Index is greater than list size");
     }
 }
@@ -211,13 +255,14 @@ void MyList<T>::remove(int position) {
         if ((position < size) && (position > 0)) {
             p1 = head;
             for (size_t i = 0; i < position - 1; i++) {
+                //Going to the element, before which we going to delete
                 p1 = p1->next;
             }
             p2 = p1->next;
-            p1->next = p2->next;
+            p1->next = p2->next; //Changing pointers
             size--;
             delete p2;
-        } else {
+        } else { //If we try to go to the elment, which doesn't exist in the list
             throw out_of_range("Index is greater than list size");
         }
     }
@@ -228,7 +273,7 @@ template <class T>
 void MyList<T>::clear() {
     Element<T> *p1, *p2 = head;
     p1 = head;
-    while (p2 != nullptr) {
+    while (p2 != nullptr) { //Going through each element and deleting all of them
         p2 = p1->next;
         delete p1;
         p1 = p2;
@@ -236,6 +281,7 @@ void MyList<T>::clear() {
     }
     head = nullptr;
     tail = nullptr;
+    size = 0;
 }
 
 //Changing the data of element at "position" position to "add"
@@ -246,13 +292,13 @@ void MyList<T>::set(T add, int position) {
     if ((position < size) && (position >= 0)) {
         p1 = head;
         for (size_t i = 0; i < position; i++) {
+            //Going to the element, which data we want to change
             p1 = p1->next;
         }
         p1->data = add;
-    } else{
+    } else{ //If we try to go to the elment, which doesn't exist in the list
         throw out_of_range("Index is greater than list size");
     }
 }
-
 
 #endif /* listTemplate_h */

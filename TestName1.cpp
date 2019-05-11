@@ -85,24 +85,26 @@ TEST(MapTests, testInsertAlreadyExist) {
 
 TEST(MapTests, testGet_Keys) {
     RedBlackTree<int, int> testTree;
-    MyList<int> testList;
+    MyList<int> *testList;
+    MyList<int> testingList = {6, 1, 5, 11};
     testTree.insert(11, 1);
     testTree.insert(6, 2);
     testTree.insert(1, 3);
     testTree.insert(5, 4);
     testList = testTree.get_keys();
-    EXPECT_EQ(1, 1);
+    EXPECT_TRUE(*testList == testingList);
 }
 
 TEST(MapTests, testGet_Values) {
     RedBlackTree<int, int> testTree;
-    MyList<int> testList;
+    MyList<int> *testList;
+    MyList<int> testingList = {2, 3, 4, 1};
     testTree.insert(11, 1);
     testTree.insert(6, 2);
     testTree.insert(1, 3);
     testTree.insert(5, 4);
     testList = testTree.get_values();
-    EXPECT_EQ(1, 1);
+    EXPECT_TRUE(*testList == testingList);
 }
 
 
@@ -189,22 +191,24 @@ TEST(CharMapTests, testInsertAlreadyExist) {
 
 TEST(CharMapTests, testGet_Keys) {
     RedBlackTree<char, char> testTree;
-    MyList<char> testList;
+    MyList<char> *testList;
+    MyList<char> testingList = {'h', 'a', 'g', 'k'};
     testTree.insert('h', 'a');
     testTree.insert('k', 'b');
     testTree.insert('a', 'c');
     testTree.insert('g', 'd');
     testList = testTree.get_keys();
-    EXPECT_EQ(1, 1);
+    EXPECT_TRUE(*testList == testingList);
 }
 
 TEST(CharMapTests, testGet_Values) {
     RedBlackTree<char, char> testTree;
-    MyList<char> testList;
+    MyList<char> *testList;
+    MyList<char> testingList = {'a', 'c', 'd', 'b'};
     testTree.insert('h', 'a');
     testTree.insert('k', 'b');
     testTree.insert('a', 'c');
     testTree.insert('g', 'd');
     testList = testTree.get_values();
-    EXPECT_EQ(1, 1);
+    EXPECT_TRUE(*testList == testingList);
 }
